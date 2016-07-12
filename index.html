@@ -21,14 +21,26 @@
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 		<script>
+			var name = prompt("whats your name?:");
 			var socket = io();
+
+			socket.emit('identification',(name,socket));
+
 			$('form').submit(function(){
-				socket.emit('chat message', $('#m').val());
+				var msg = $('#m').val();
+				msg = name + ":" + msg;
+				socket.emit('chat message', msg);
 				$('#m').val('');
 				return false;
 			});
+			socket.on('new connection', function(name){
+				$('#messages').append($('<li>').text(name + " has entered the room."));
+			});
 			socket.on('chat message', function(msg){
 				$('#messages').append($('<li>').text(msg));
+			});
+			socket.on('disconnection', function(name){
+				$('#messages').append($('<li>').text(name + " has left the room."));
 			});
 		</script>
 	</body>
